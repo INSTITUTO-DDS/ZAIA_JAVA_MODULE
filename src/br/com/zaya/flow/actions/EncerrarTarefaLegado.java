@@ -32,7 +32,7 @@ import java.util.Objects;
 
 public class EncerrarTarefaLegado implements AcaoRotinaJava {
     private final EntityFacade dwFacade = EntityFacadeFactory.getDWFFacade();
-    private br.com.sankhya.workflow.model.services.ListaTarefaSP ListaTarefaSP;
+    //private br.com.sankhya.workflow.model.services.ListaTarefaSP ListaTarefaSP; // Ajuste feito em 31/10/2025
     private JdbcWrapper jdbc = null;
     @Override
     public void doAction(ContextoAcao contexto) throws Exception {
@@ -52,7 +52,7 @@ public class EncerrarTarefaLegado implements AcaoRotinaJava {
 
             while (rs.next()) {
 
-                BigDecimal nuNota = (BigDecimal) reg.getCampo("NUNOTA");
+                //BigDecimal nuNota = (BigDecimal) reg.getCampo("NUNOTA"); // Ajuste feito em 31/10/2025
                 BigDecimal nuFin = (BigDecimal) reg.getCampo("NUFIN");
                 BigDecimal idInstPrn = rs.getBigDecimal("IDINSTPRN");
                 BigDecimal codPrn = rs.getBigDecimal("CODPRN");
@@ -104,10 +104,13 @@ public class EncerrarTarefaLegado implements AcaoRotinaJava {
 
                     contexto.setMensagemRetorno("Dados atualizados! ");
                 }catch (Exception e){
+                    qryFin.close(); // Ajuste feito em 31/10/2025
                     e.printStackTrace();
                     throw new Exception(e.getMessage());
                 }
             }
+
+            qryFin.close();
         }
     }
 
@@ -133,6 +136,8 @@ public class EncerrarTarefaLegado implements AcaoRotinaJava {
 
             ResultSet rsTarefas = null;
             rsTarefas = qryTarefas.executeQuery();
+
+            qryTarefas.close();  // Ajuste feito em 31/10/2025
 
             while (rsTarefas.next()) {
                 processId = rsTarefas.getBigDecimal("PROCESSID");

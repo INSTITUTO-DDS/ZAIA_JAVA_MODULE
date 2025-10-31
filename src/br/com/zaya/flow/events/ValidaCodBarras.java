@@ -17,7 +17,7 @@ public class ValidaCodBarras implements EventoProcessoJava {
         for(DynamicVO notasVO : fatConVo){
             String tipoPag = notasVO.asString("TIPOPAG");
             if(tipoPag.contains("B") && notasVO.asString("CODBARRAS") == null){
-                mensagemErro = "<br><br>Não foi possível finalizar a tarefa:<br><br>Favor adicionar o código de barras do boleto no campo informado.";
+                mensagemErro = "<br><br>NÃ£o foi possÃ­vel finalizar a tarefa:<br><br>Favor adicionar o cÃ³digo de barras do boleto no campo informado.";
                 throw new Exception(mensagemErro);
             }
         }

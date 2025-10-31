@@ -56,8 +56,11 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
 
                 String nomeTarefaFin = reg.getCampo("AD_NOMETAREFA").toString();
                 String nomeTarefa = rs.getString("NOMETAREFA");
-                if ( !nomeTarefa.equals(nomeTarefaFin) ) {
-                    throw new MGEModelException("Esta a��o s� pode ser executada quando a tarefa do Flow for:<br><b>"+nomeTarefa+"</b><br>A tarefa atual �:<br><b>" + nomeTarefaFin + ".</b>");
+
+                if (!nomeTarefa.equals(nomeTarefaFin)) {
+                    qryFin.close(); // Ajuste feito em 31/10/2025
+                    throw new MGEModelException("Esta ação só pode ser executada quando a tarefa do Flow for:<br><b>"
+                            + nomeTarefa + "</b><br>A tarefa atual é:<br><b>" + nomeTarefaFin + ".</b>");
                 }
 
                 BigDecimal nuNota = (BigDecimal) reg.getCampo("NUNOTA");
@@ -71,21 +74,28 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
                 String obs = (String) ctx.getParam("OBS");
                 String statusComp = (String) ctx.getParam("STATUSANXCOMP");
 
-                Collection<DynamicVO> tarefasVO = JapeFactory.dao("AD_TWFTSF").find("this.VALIDA = 'S' AND this.IDELEMENTO = ?", idElemento);
+                Collection<DynamicVO> tarefasVO = JapeFactory.dao("AD_TWFTSF")
+                        .find("this.VALIDA = 'S' AND this.IDELEMENTO = ?", idElemento);
 
-                if ( tarefasVO.isEmpty() ) {
-                    throw new MGEModelException("O processo ao qual este nro. �nico est� vinculado n�o se encontra mais em uma etapa do setor financeiro.<br>A a��o n�o pode ser executada!");
+                if (tarefasVO.isEmpty()) {
+                    qryFin.close(); // Ajuste feito em 31/10/2025
+                    throw new MGEModelException(
+                            "O processo ao qual este nro. Único está vinculado n�o se encontra mais em uma etapa do setor financeiro.<br>A ação não pode ser executada!");
                 }
 
                 try {
 
-                    BigDecimal grupoValidacao = JapeFactory.dao(DynamicEntityNames.PROCESSO_NEGOCIO).findByPK(codPrn, versao).asBigDecimal("AD_GRUPOVALIDACAO");
-                    String tabelaNotas = Objects.equals(grupoValidacao, BigDecimal.ONE) ? "AD_FATCONNOTAS" : "AD_REQNOTAS";
+                    BigDecimal grupoValidacao = JapeFactory.dao(DynamicEntityNames.PROCESSO_NEGOCIO)
+                            .findByPK(codPrn, versao).asBigDecimal("AD_GRUPOVALIDACAO");
+                    String tabelaNotas = Objects.equals(grupoValidacao, BigDecimal.ONE) ? "AD_FATCONNOTAS"
+                            : "AD_REQNOTAS";
                     tabelaNotas = codPrn.compareTo(new BigDecimal(12)) == 0 ? "AD_FLXDEPDOC" : tabelaNotas;
                     String situaFin = Objects.equals(grupoValidacao, BigDecimal.ONE) ? "S" : statusComp;
-                    String msg = Objects.equals(grupoValidacao, BigDecimal.ONE) && statusComp.contains("AP") ? "Esta op��o n�o pode ser usada com este processo. Favor selecionar outro tipo de ajuste." : "";
+                    String msg = Objects.equals(grupoValidacao, BigDecimal.ONE) && statusComp.contains("AP")
+                            ? "Esta op��o n�o pode ser usada com este processo. Favor selecionar outro tipo de ajuste."
+                            : "";
 
-                    if(!msg.isEmpty()){
+                    if (!msg.isEmpty()) {
                         throw new MGEModelException(msg);
                     }
 
@@ -127,16 +137,22 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
                     ctx.setMensagemRetorno("Dados atualizados! ");
 
                 } catch (Exception e) {
+                    qryFin.close(); // Ajuste feito em 31/10/2025
                     e.printStackTrace();
                     throw new MGEModelException(e.getMessage());
+
                 }
             }
+
+             qryFin.close();
+
         }
     }
 
     public void encTarefa(BigDecimal nuFin) throws MGEModelException {
         try {
-            ListaTarefaSP listaTarefaSP = (ListaTarefaSP) ServiceUtils.getStatelessFacade(ListaTarefaSPHome.JNDI_NAME, ListaTarefaSPHome.class);
+            ListaTarefaSP listaTarefaSP = (ListaTarefaSP) ServiceUtils.getStatelessFacade(ListaTarefaSPHome.JNDI_NAME,
+                    ListaTarefaSPHome.class);
             jdbc = dwFacade.getJdbcWrapper();
             jdbc.openSession();
 
@@ -154,6 +170,9 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
 
             ResultSet rsTarefas = null;
             rsTarefas = qryTarefas.executeQuery();
+
+
+            qryTarefas.close(); // Ajuste feito em 31/10/2025
 
             while (rsTarefas.next()) {
                 processId = rsTarefas.getBigDecimal("PROCESSID");
@@ -179,8 +198,7 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
                             "        \"taskIdElemento\": " + taskIdElemento + ",\n" +
                             "        \"taskInstanceId\": \"" + taskInstanceId + "\"\n" +
                             "    }\n" +
-                            "}"
-            );
+                            "}");
 
             String params2 = String.format(
                     "{\n" +
@@ -188,8 +206,7 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
                             "        \"processInstanceId\": " + processInstanceId + ",\n" +
                             "        \"taskInstanceId\": \"" + taskInstanceId + "\"\n" +
                             "    }\n" +
-                            "}"
-            );
+                            "}");
 
             JsonObject param = JsonUtils.convertStringToJsonObject(params2);
             sctx.setJsonRequestBody(param);

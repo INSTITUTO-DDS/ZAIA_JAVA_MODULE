@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 
-
 public class incFinanceiroDiretoZaya implements TarefaJava {
     @Override
     public void executar(ContextoTarefa contexto) throws Exception {
@@ -34,7 +33,7 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
         BigDecimal usuarioInclusao = NativeSql.getBigDecimal(
                 "CODUSUINC", "TWFIPRN", "IDINSTPRN = " + contexto.getIdInstanceProcesso());
         String nomeUsu = NativeSql.getString(
-                "NOMEUSU", "TSIUSU", "CODUSU = ?", new Object[]{usuarioInclusao});
+                "NOMEUSU", "TSIUSU", "CODUSU = ?", new Object[] { usuarioInclusao });
         Registro[] fatCon = contexto.getLinhasFormulario("AD_FATCON");
         Registro[] conNotas = contexto.getLinhasFormulario("AD_FATCONNOTAS");
 
@@ -57,7 +56,7 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
                     "CT.CODCTABCOINT",
                     "AD_CRTSICTA C1 INNER JOIN TSICTA CT ON C1.CODCTABCOINT = CT.CODCTABCOINT",
                     "CT.CLASSE = 'C' AND C1.CODCENCUS = ? AND CT.ATIVA = 'S' AND C1.CODEMP = ?",
-                    new Object[]{codCen, codEmp});
+                    new Object[] { codCen, codEmp });
             if (codCtb == null) {
                 codCtb = BigDecimal.ZERO;
             }
@@ -73,9 +72,12 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
 
                 String tipoPag = (String) conNotas[0].getCampo("TIPOPAG");
                 BigDecimal codTipTit = null;
-                if ("B".equals(tipoPag)) codTipTit = BigDecimal.valueOf(20L);
-                if ("P".equals(tipoPag)) codTipTit = BigDecimal.valueOf(38L);
-                if ("T".equals(tipoPag)) codTipTit = BigDecimal.valueOf(19L);
+                if ("B".equals(tipoPag))
+                    codTipTit = BigDecimal.valueOf(20L);
+                if ("P".equals(tipoPag))
+                    codTipTit = BigDecimal.valueOf(38L);
+                if ("T".equals(tipoPag))
+                    codTipTit = BigDecimal.valueOf(19L);
 
                 BigDecimal nufinRec;
                 try {
@@ -96,13 +98,14 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
                     try {
                         finVo.setProperty("NUMNOTA", new BigDecimal(numNota));
                     } catch (NumberFormatException e) {
-                        throw new MGEModelException("Número da nota inválido: " + numNota +". Este campo aceita somente n�meros!", e);
+                        throw new MGEModelException(
+                                "Número da nota inválido: " + numNota + ". Este campo aceita somente n�meros!", e);
                     }
 
                     finVo.setProperty("HISTORICO", observacoes);
                     finVo.setProperty("AD_ORIGEMFLOW", "S");
 
-                    if ("B".equals(tipoPag) && (codBarra == null || codBarra.trim().isEmpty())) {
+                    if ("B".equals(tipoPag) && (codBarra == null || codBarra.trim().isEmpty()))  { // Ajuste feito em 31/10/2025
                         throw new MGEModelException("Código de barras inválido: " + codBarra);
                     }
                     finVo.setProperty("CODBARRA", codBarra);
@@ -119,10 +122,13 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
                 JdbcWrapper jdbc = EntityFacadeFactory.getDWFFacade().getJdbcWrapper();
                 jdbc.openSession();
                 NativeSql nativeSql = new NativeSql(jdbc);
-                nativeSql.appendSql("INSERT INTO TGFFIN_TNF (TNF_IDINSTTAR, TNF_ESCOPO, TNF_IDINSTPRN, TNF_DHCRIACAO, TNF_IDTAREFA, NUFIN) VALUES (0, 'P', :IDINSTPRN, GETDATE(), 0, :NUFIN)");
+                nativeSql.appendSql(
+                        "INSERT INTO TGFFIN_TNF (TNF_IDINSTTAR, TNF_ESCOPO, TNF_IDINSTPRN, TNF_DHCRIACAO, TNF_IDTAREFA, NUFIN) VALUES (0, 'P', :IDINSTPRN, GETDATE(), 0, :NUFIN)");
                 nativeSql.setNamedParameter("IDINSTPRN", contexto.getIdInstanceProcesso());
                 nativeSql.setNamedParameter("NUFIN", nufinRec);
                 nativeSql.executeUpdate();
+
+                nativeSql.close(); // Ajuste feito em 31/10/2025
 
                 JapeWrapper finDao = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
                 DynamicVO finVO = finDao.findByPK(nufinRec);
@@ -133,6 +139,9 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
                 qryDados.setNamedParameter("NUFIN", nufinRec);
 
                 ResultSet rsDados = qryDados.executeQuery();
+
+                qryDados.close(); // Ajuste feito em 31/10/2025
+
                 while (rsDados.next()) {
                     JapeWrapper finDAO = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
                     FluidUpdateVO finUpdVO = finDAO.prepareToUpdate(finVO);

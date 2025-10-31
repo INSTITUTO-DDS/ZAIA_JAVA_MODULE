@@ -80,16 +80,16 @@ public class ApiOcr {
 
                         try {
                             codBarras = LinhaDigitavelExtractor.extraiCodBarras(parsedText);
-                            System.out.println("ApiOCR - C�digo extra�do: " + codBarras);
+                            System.out.println("ApiOCR - Código extra�do: " + codBarras);
 
                             if (codBarras == null || codBarras.trim().isEmpty()) {
-                                registrarLog("Erro na extra��o - APIOcr", "N�o foi poss�vel extrair c�digo de barras do texto. Texto OCR: " + parsedText, null, "Boleto", codUsu, idInstPrn);
+                                registrarLog("Erro na extração - APIOcr", "Não foi possível extrair código de barras do texto. Texto OCR: " + parsedText, null, "Boleto", codUsu, idInstPrn);
                             } else {
-                                registrarLog("Sucesso Extra��o", "C�digo de barras extra�do com sucesso. Texto OCR: " + parsedText, codBarras, "Boleto", codUsu, idInstPrn);
+                                registrarLog("Sucesso Extração", "Código de barras extra�do com sucesso. Texto OCR: " + parsedText, codBarras, "Boleto", codUsu, idInstPrn);
                             }
 
                         } catch (Exception e) {
-                            registrarLog("Erro na extra��o", "Falha ao extrair c�digo de barras. Erro: " + e.getMessage(), null, "Boleto", codUsu, idInstPrn);
+                            registrarLog("Erro na extração", "Falha ao extrair Código de barras. Erro: " + e.getMessage(), null, "Boleto", codUsu, idInstPrn);
                             e.printStackTrace();
                         }
                     }
@@ -100,8 +100,8 @@ public class ApiOcr {
                 }
 
             } else {
-                registrarLog("Erro na chamada da API", "C�digo HTTP: " + responseCode, null, "Boleto", codUsu, idInstPrn);
-                System.err.println("Erro na requisi��o: C�digo HTTP " + responseCode);
+                registrarLog("Erro na chamada da API", "Código HTTP: " + responseCode, null, "Boleto", codUsu, idInstPrn);
+                System.err.println("Erro na requisição: Código HTTP " + responseCode);
             }
 
         } catch (Exception e) {

@@ -36,7 +36,6 @@ import java.nio.file.Files;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Collection;
-import java.util.Objects;
 
 public class FlowHelperIdds {
     private static final EntityFacade dwFacade = EntityFacadeFactory.getDWFFacade();
@@ -58,12 +57,14 @@ public class FlowHelperIdds {
 
             ResultSet rs = qryFin.executeQuery();
 
+            qryFin.close(); // Ajuste feito em 31/10/2025
+
             while (rs.next()) {
                 System.out.println("___Entrei no while dos financeiros___");
-                if ( mdf.isModifing("DHBAIXA") && mdf.getNewValue("DHBAIXA") != null ) {
+                if (mdf.isModifing("DHBAIXA") && mdf.getNewValue("DHBAIXA") != null) {
                     JapeSession.SessionHandle hnd = null;
                     ResultSet rsDados = null;
-                    System.out.println("___T�tulo sendo baixado___");
+                    System.out.println("___título sendo baixado___");
 
                     try {
 
@@ -75,7 +76,7 @@ public class FlowHelperIdds {
                         String compAnxo = (companx == null || companx.isEmpty()) ? "N" : companx;
                         BigDecimal idInstPrn = rs.getBigDecimal("IDINSTPRN");
                         String status = "PI";
-                        String obs = "Aprovado (Finaliza��o autom�tica de tarefa por baixa do financeiro).";
+                        String obs = "Aprovado (Finalização automática de tarefa por baixa do financeiro).";
                         String nomeTarefaFin = dynamicVO.asString("AD_NOMETAREFA");
                         String autenticacao = dynamicVO.asString("AD_AUTENTICACAO");
                         String idElemento;
@@ -107,10 +108,10 @@ public class FlowHelperIdds {
 
                         compAnxo = autenticacao != null ? "N" : compAnxo;
 
-                        if( !rsRfe.isBeforeFirst() && compAnxo.equals("N")) {
-                            throw new Exception("<b>N�o � poss�vel realizar a baixa deste financeiro!</b><br>" +
-                                    "Este t�tulo � referente ao processo de nro.: "+idInstPrn+" do Flow. " +
-                                    "Para baixar o financeiro adicione um comprovante manualmente ou ent�o verifique se existe comprovante personalizado para este tipo de t�tulo.");
+                        if (!rsRfe.isBeforeFirst() && compAnxo.equals("N")) {
+                            throw new Exception("<b>Não é possível realizar a baixa deste financeiro!</b><br>" +
+                                    "Este título é referente ao processo de nro.: " + idInstPrn + " do Flow. " +
+                                    "Para baixar o financeiro adicione um comprovante manualmente ou então verifique se existe comprovante personalizado para este tipo de título.");
                         }
                         while (rsRfe.next()) {
                             nuRfe = rsRfe.getBigDecimal("CODRELATORIO");
@@ -129,30 +130,30 @@ public class FlowHelperIdds {
                                 .find("this.VALIDA = 'S' AND this.IDELEMENTO = ?", idElemento);
 
                         System.out.println("Conte�do vindo da tabela de tarefas: " + tarefasVO.isEmpty());
-                        if ( tarefasVO.isEmpty() ) {
+                        if (tarefasVO.isEmpty()) {
                             System.out.println(
-                                    "O processo ao qual este nro. �nico est� vinculado n�o se encontra mais em uma etapa do setor financeiro.<br>A a��o n�o pode ser executada!");
+                                    "O processo ao qual este nro. único está vinculado não se encontra mais em uma etapa do setor financeiro.<br>A ação não pode ser executada!");
                             return;
                         }
 
-                        if ( dhBaixa != null ) {
-                            if ( !BigDecimalUtil.isNullOrZero(vlrBaixa) ) {
+                        if (dhBaixa != null) {
+                            if (!BigDecimalUtil.isNullOrZero(vlrBaixa)) {
 
-                                if(compAnxo.equals("S")) {
+                                if (compAnxo.equals("S")) {
                                     String arquivo = StringUtils.getValueOrDefault(getFilePath(nuFin), "N");
-                                    System.out.println("Entrei aqui: Tem arquivo? "+arquivo);
-                                    if(arquivo.contains("N")) {
-                                        throw new Exception("<b>N�o foi poss�vel realizar baixa!</b><br>" +
-                                                "Este t�tulo indica que o comprovante foi anexado manualmente, por�m nenhum arquivo em anexo foi encontrado.");
+                                    System.out.println("Entrei aqui: Tem arquivo? " + arquivo);
+                                    if (arquivo.contains("N")) {
+                                        throw new Exception("<b>Não foi possível realizar baixa!</b><br>" +
+                                                "Este título indica que o comprovante foi anexado manualmente, por�m nenhum arquivo em anexo foi encontrado.");
                                     }
                                 }
 
-                                if(compAnxo.equals("N")) {
-                                    if(nuRfe == null) {
-                                        throw new MGEModelException("<b>N�o foi poss�vel realizar baixa!</b><br>" +
+                                if (compAnxo.equals("N")) {
+                                    if (nuRfe == null) {
+                                        throw new MGEModelException("<b>Não foi possível realizar baixa!</b><br>" +
                                                 "Ocorreu um erro ao tentar gerar o comprovante personalizado.");
-                                    }else {
-                                        System.out.println("Esta no if para chamar m�todo de Comprovante");
+                                    } else {
+                                        System.out.println("Esta no if para chamar método de Comprovante");
                                         GerenciadorArquivos arquivo = new GerenciadorArquivos();
                                         arquivo.obtemRelatorio(nuFin, nuRfe, codUsu);
                                     }
@@ -162,10 +163,12 @@ public class FlowHelperIdds {
                                     String tabelaNotas = "AD_FATCONNOTAS";
 
                                     JapeWrapper adFatconnotasDAO = JapeFactory.dao(tabelaNotas);
-                                    Collection<DynamicVO> fatConNotasVO = adFatconnotasDAO.find("this.IDINSTPRN = ?", idInstPrn);
+                                    Collection<DynamicVO> fatConNotasVO = adFatconnotasDAO.find("this.IDINSTPRN = ?",
+                                            idInstPrn);
 
                                     JapeWrapper aprovacaoDAO = JapeFactory.dao("AD_APROVACAO");
-                                    Collection<DynamicVO> aprovacoesVO = aprovacaoDAO.find("this.IDINSTPRN = ?", idInstPrn);
+                                    Collection<DynamicVO> aprovacoesVO = aprovacaoDAO.find("this.IDINSTPRN = ?",
+                                            idInstPrn);
 
                                     for (DynamicVO fatConNotaVO : fatConNotasVO) {
                                         FluidUpdateVO updFatConNotasVO = adFatconnotasDAO.prepareToUpdate(fatConNotaVO);
@@ -189,10 +192,11 @@ public class FlowHelperIdds {
                                     File file = new File(getFilePath(nuFin));
                                     byte[] pdfBytes = Files.readAllBytes(file.toPath());
 
-                                    if ( pdfBytes != null && pdfBytes.length > 0 ) {
+                                    if (pdfBytes != null && pdfBytes.length > 0) {
                                         try {
                                             ServiceContext contexto = ServiceContext.getCurrent();
-                                            SessionFile sessionFile = SessionFile.createSessionFile("comprovante.pdf", "application/pdf", pdfBytes);
+                                            SessionFile sessionFile = SessionFile.createSessionFile("comprovante.pdf",
+                                                    "application/pdf", pdfBytes);
 
                                             contexto.putHttpSessionAttribute("sessionkey", sessionFile);
 
@@ -205,7 +209,7 @@ public class FlowHelperIdds {
 
                                     try {
                                         encTarefa(nuFin);
-                                    }finally {
+                                    } finally {
                                         System.out.println("___Atualizando dados no financeiro FinalizaTarefaBaixa___");
                                         try {
 
@@ -218,6 +222,9 @@ public class FlowHelperIdds {
                                             qryCodBarras.setNamedParameter("NUFIN", dynamicVO.asBigDecimal("NUFIN"));
 
                                             ResultSet rsCodBarras = qryCodBarras.executeQuery();
+
+                                            qryCodBarras.close(); // Ajuste feito em 31/10/2025
+
                                             while (rsCodBarras.next()) {
                                                 JapeWrapper finDAO = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
                                                 FluidUpdateVO finUpdVO = finDAO.prepareToUpdate(dynamicVO);
@@ -227,9 +234,9 @@ public class FlowHelperIdds {
                                                 finUpdVO.update();
                                             }
                                             rsCodBarras.close();
-                                        }catch (Exception e){
+                                        } catch (Exception e) {
                                             e.printStackTrace();
-                                        }finally {
+                                        } finally {
                                             jdbc.closeSession();
                                         }
                                     }
@@ -242,25 +249,27 @@ public class FlowHelperIdds {
 
                     } catch (Exception e) {
                         e.printStackTrace();
-                        throw new MGEModelException("Erro durante a execu��o do evento que realiza a baixa do t�tulo no Flow: " + e.getMessage());
+                        throw new MGEModelException(
+                                "Erro durante a execução do evento que realiza a baixa do título no Flow: "
+                                        + e.getMessage());
                     } finally {
                         JapeSession.close(hnd);
                     }
                 } else {
-                    System.err.println("N�o � baixa.");
+                    System.err.println("Não é baixa.");
                 }
             }
             rs.close();
         } catch (Exception e) {
             e.printStackTrace();
             throw new MGEModelException(e);
-        }finally {
+        } finally {
             jdbc.closeSession();
         }
     }
 
     public void finalizarTarefaRemessa(ModifingFields mdf, DynamicVO dynamicVO) throws MGEModelException {
-        if ( mdf.isModifing("NUMREMESSA") && mdf.getNewValue("NUMREMESSA") != null ) {
+        if (mdf.isModifing("NUMREMESSA") && mdf.getNewValue("NUMREMESSA") != null) {
             String nomeTarefa = "Analisar Lan�amento - Financeiro";
             JapeSession.SessionHandle hnd = null;
             ResultSet rsDados = null;
@@ -271,7 +280,8 @@ public class FlowHelperIdds {
                 DynamicVO tnfCabVO = JapeFactory.dao(DynamicEntityNames.CABECALHO_NOTA).findByPK(nuNota);
                 BigDecimal idInstPrn = tnfCabVO.asBigDecimal("AD_IDINSTPRN");
                 String status = "S";
-                String obs = "Pagamento autorizado pelo setor financeiro. Remessa de pagamento de n�"+mdf.getNewValue("NUMREMESSA")+" gerada e enviada ao banco.";
+                String obs = "Pagamento autorizado pelo setor financeiro. Remessa de pagamento de n�"
+                        + mdf.getNewValue("NUMREMESSA") + " gerada e enviada ao banco.";
 
                 hnd = JapeSession.open();
                 jdbc = dwFacade.getJdbcWrapper();
@@ -283,6 +293,9 @@ public class FlowHelperIdds {
                 qryDados.setNamedParameter("NUFIN", nuFin);
 
                 rsDados = qryDados.executeQuery();
+
+                qryDados.close(); // Ajuste feito em 31/10/2025
+
                 String idElemento = " ";
 
                 while (rsDados.next()) {
@@ -290,7 +303,7 @@ public class FlowHelperIdds {
                     idElemento = rsDados.getString("IDELEMENTO");
                 }
 
-                if ( !nomeTarefa.equals(nomeTarefa) ) {
+                if (!nomeTarefa.equals(nomeTarefa)) {
                     System.out.println(
                             "Esta a��o s� pode ser executada quando a tarefa do Flow for:<br><b>Analisar Lan�amento - Financeiro.</b><br>A tarefa atual �:<br><b>"
                                     + dynamicVO.asString("AD_NOMETAREFA") + ".</b>");
@@ -309,9 +322,9 @@ public class FlowHelperIdds {
                 Collection<DynamicVO> tarefasVO = JapeFactory.dao("AD_TWFTSF")
                         .find("this.VALIDA = 'S' AND this.IDELEMENTO = ?", idElemento);
 
-                if ( tarefasVO.isEmpty() ) {
+                if (tarefasVO.isEmpty()) {
                     System.out.println(
-                            "O processo ao qual este nro. �nico est� vinculado n�o se encontra mais em uma etapa do setor financeiro.<br>A a��o n�o pode ser executada!");
+                            "O processo ao qual este nro. �nico est� vinculado Não se encontra mais em uma etapa do setor financeiro.<br>A a��o Não pode ser executada!");
                     return;
                 }
 
@@ -339,21 +352,22 @@ public class FlowHelperIdds {
                     throw new MGEModelException(e.getMessage());
                 }
 
-
             } catch (Exception e) {
-                throw new MGEModelException("Erro durante a execu��o do evento que realiza a baixa do t�tulo no Flow: " + e.getMessage());
+                throw new MGEModelException(
+                        "Erro durante a execução do evento que realiza a baixa do título no Flow: " + e.getMessage());
             } finally {
                 JapeSession.close(hnd);
             }
         } else {
-            System.err.println("N�o � remessa.");
+            System.err.println("Não � remessa.");
         }
     }
 
     public void encTarefa(BigDecimal nuFin) throws MGEModelException {
         System.out.println("Iniciando encTarefa com nuFin: " + nuFin);
         try {
-            ListaTarefaSP listaTarefaSP = (ListaTarefaSP) ServiceUtils.getStatelessFacade(ListaTarefaSPHome.JNDI_NAME, ListaTarefaSPHome.class);
+            ListaTarefaSP listaTarefaSP = (ListaTarefaSP) ServiceUtils.getStatelessFacade(ListaTarefaSPHome.JNDI_NAME,
+                    ListaTarefaSPHome.class);
             jdbc = dwFacade.getJdbcWrapper();
             jdbc.openSession();
 
@@ -371,6 +385,9 @@ public class FlowHelperIdds {
 
             ResultSet rsTarefas = null;
             rsTarefas = qryTarefas.executeQuery();
+
+            qryTarefas.close(); // Ajuste feito em 31/10/2025
+
 
             while (rsTarefas.next()) {
                 processId = rsTarefas.getBigDecimal("PROCESSID");
@@ -396,8 +413,7 @@ public class FlowHelperIdds {
                             "        \"taskIdElemento\": " + taskIdElemento + ",\n" +
                             "        \"taskInstanceId\": \"" + taskInstanceId + "\"\n" +
                             "    }\n" +
-                            "}"
-            );
+                            "}");
 
             String params2 = String.format(
                     "{\n" +
@@ -405,8 +421,7 @@ public class FlowHelperIdds {
                             "        \"processInstanceId\": " + processInstanceId + ",\n" +
                             "        \"taskInstanceId\": \"" + taskInstanceId + "\"\n" +
                             "    }\n" +
-                            "}"
-            );
+                            "}");
 
             JsonObject param = JsonUtils.convertStringToJsonObject(params2);
             sctx.setJsonRequestBody(param);
@@ -429,11 +444,12 @@ public class FlowHelperIdds {
 
     private void updateData(byte[] pdfBytes, BigDecimal idInstPrn, String tabela) throws Exception {
         JapeWrapper fatConNotasDAO = JapeFactory.dao(tabela);
-        DynamicVO fatConNotasVO = fatConNotasDAO.findByPK(idInstPrn, new BigDecimal(0), new BigDecimal(1), new BigDecimal(1));
-
+        DynamicVO fatConNotasVO = fatConNotasDAO.findByPK(idInstPrn, new BigDecimal(0), new BigDecimal(1),
+                new BigDecimal(1));
 
         System.out.println("Antes de entrar no metodo de convers�o");
-        CampoAnexoBlob anexoBlob = new CampoAnexoBlob(pdfBytes, "Comprovante", 135005, "application/octet-stream", "Jun 10, 2024 10:56:02");
+        CampoAnexoBlob anexoBlob = new CampoAnexoBlob(pdfBytes, "Comprovante", 135005, "application/octet-stream",
+                "Jun 10, 2024 10:56:02");
 
         FluidUpdateVO fUpdateVO = fatConNotasDAO.prepareToUpdate(fatConNotasVO);
         fUpdateVO.set("COMPPAG", anexoBlob.getArquivo());
@@ -449,6 +465,9 @@ public class FlowHelperIdds {
             qryArquivo.cleanParameters();
             qryArquivo.setNamedParameter("NUFIN", nuFin);
             ResultSet rsArquivo = qryArquivo.executeQuery();
+
+            qryArquivo.close(); // Ajuste feito em 31/10/2025
+
 
             String chave = "";
             String filePath = "";

@@ -1,6 +1,5 @@
 package br.com.zaya.flow.events;
 
-
 import br.com.sankhya.extensions.eventoprogramavel.EventoProgramavelJava;
 import br.com.sankhya.jape.EntityFacade;
 import br.com.sankhya.jape.core.JapeSession;
@@ -32,7 +31,7 @@ public class EventoFinanceiroFlow implements EventoProgramavelJava {
         ModifingFields mdf = event.getModifingFields();
         boolean isBaixando = JapeSession.getPropertyAsBoolean("mov.financeiro.baixando", false).booleanValue();
 
-        if(mdf.isModifing("DHBAIXA") && mdf.getNewValue("DHBAIXA") != null ) {
+        if (mdf.isModifing("DHBAIXA") && mdf.getNewValue("DHBAIXA") != null) {
             System.out.println("___Iniciando EventoFinanceiroFlow___");
             flwHpIdds.finalizaTarefaBaixa(mdf, dynamicVO);
         }
@@ -48,6 +47,9 @@ public class EventoFinanceiroFlow implements EventoProgramavelJava {
             qryCodBarras.setNamedParameter("NUFIN", dynamicVO.asBigDecimal("NUFIN"));
 
             ResultSet rsCodBarras = qryCodBarras.executeQuery();
+
+            qryCodBarras.close(); // Ajuste feito em 31/10/2025
+
             while (rsCodBarras.next()) {
                 JapeWrapper finDAO = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
                 FluidUpdateVO finUpdVO = finDAO.prepareToUpdate(dynamicVO);
@@ -58,9 +60,9 @@ public class EventoFinanceiroFlow implements EventoProgramavelJava {
                 finUpdVO.update();
             }
             rsCodBarras.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             jdbc.closeSession();
         }
     }
@@ -80,6 +82,9 @@ public class EventoFinanceiroFlow implements EventoProgramavelJava {
             qryCodBarras.setNamedParameter("NUFIN", finVO.asBigDecimal("NUFIN"));
 
             ResultSet rsCodBarras = qryCodBarras.executeQuery();
+
+            qryCodBarras.close(); // Ajuste feito em 31/10/2025
+
             while (rsCodBarras.next()) {
                 JapeWrapper finDAO = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
                 FluidUpdateVO finUpdVO = finDAO.prepareToUpdate(finVO);
@@ -92,9 +97,9 @@ public class EventoFinanceiroFlow implements EventoProgramavelJava {
                 finUpdVO.update();
             }
             rsCodBarras.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             jdbc.closeSession();
         }
     }

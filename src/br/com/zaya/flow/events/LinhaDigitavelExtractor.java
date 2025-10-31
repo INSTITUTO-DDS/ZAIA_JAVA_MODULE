@@ -29,7 +29,7 @@ public class LinhaDigitavelExtractor {
             }
         }
 
-        throw new Exception("Não foi possível ler o código de barras do texto.");
+        throw new Exception("Nï¿½o foi possï¿½vel ler o cÃ³digo de barras do texto.");
     }
 
     private static String sanitize(String s) {

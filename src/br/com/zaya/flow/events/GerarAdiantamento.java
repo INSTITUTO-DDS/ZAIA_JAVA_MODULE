@@ -13,7 +13,6 @@ import br.com.sankhya.modelcore.util.EntityFacadeFactory;
 import br.com.sankhya.ws.ServiceContext;
 import br.com.sankhya.ws.transformer.json.Json2XMLParser;
 import com.google.gson.JsonObject;
-import com.sankhya.util.BigDecimalUtil;
 import com.sankhya.util.JsonUtils;
 
 import java.math.BigDecimal;

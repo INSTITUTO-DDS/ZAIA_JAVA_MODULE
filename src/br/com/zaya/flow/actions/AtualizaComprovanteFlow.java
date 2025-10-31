@@ -33,7 +33,7 @@ public class AtualizaComprovanteFlow implements AcaoRotinaJava {
 
             String nomeTarefa = "Anexar Comprovante de Pagamento";
             if(!nomeTarefa.equals(reg.getCampo("AD_NOMETAREFA"))){
-                throw new MGEModelException("Esta ação só pode ser executada quando a tarefa do Flow for:<br><b>Anexar Comprovante de Pagamento.</b><br>A tarefa atual é:<br><b>"+reg.getCampo("AD_NOMETAREFA")+".</b>");
+                throw new MGEModelException("Esta aÃ§Ã£o sÃ³ pode ser executada quando a tarefa do Flow for:<br><b>Anexar Comprovante de Pagamento.</b><br>A tarefa atual ï¿½:<br><b>"+reg.getCampo("AD_NOMETAREFA")+".</b>");
             }
 
             BigDecimal nuNota = (BigDecimal) reg.getCampo("NUNOTA");
@@ -49,7 +49,7 @@ public class AtualizaComprovanteFlow implements AcaoRotinaJava {
             Collection<DynamicVO> tarefasVO = JapeFactory.dao("AD_TWFTSF").find("this.VALIDA = 'S' AND this.IDELEMENTO = ?", idElemento);
 
             if( tarefasVO.isEmpty() ){
-                throw new MGEModelException("O processo ao qual este nro. único está vinculado não se encontra mais em uma etapa do setor financeiro.<br>A ação não pode ser executada!");
+                throw new MGEModelException("O processo ao qual este nro. Ãšnico estÃ¡ vinculado nÃ£o se encontra mais em uma etapa do setor financeiro.<br>A aÃ§Ã£o nÃ£o pode ser executada!");
             }
 
             try{
@@ -97,10 +97,10 @@ public class AtualizaComprovanteFlow implements AcaoRotinaJava {
         DynamicVO fatConNotasVO = fatConNotasDAO.findByPK(idInstPrn, new BigDecimal(0), new BigDecimal(1), new BigDecimal(1));
 
 
-        System.out.println("Antes de entrar no metodo de conversão");
+        System.out.println("Antes de entrar no metodo de conversÃ£o");
         CampoAnexoBlob anexoBlob = new CampoAnexoBlob(pdfBytes, "Comprovante", 135005, "application/octet-stream", "Jun 10, 2024 10:56:02");
 
-        // Ajusta a atualização de dados usando FluidUpdateVO
+        // Ajusta a atualizaï¿½ï¿½o de dados usando FluidUpdateVO
         FluidUpdateVO fUpdateVO = fatConNotasDAO.prepareToUpdate(fatConNotasVO);
         fUpdateVO.set("COMPPAG", anexoBlob.getArquivo());
         fUpdateVO.update();

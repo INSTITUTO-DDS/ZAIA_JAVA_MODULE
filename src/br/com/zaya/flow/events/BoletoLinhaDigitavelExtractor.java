@@ -106,8 +106,8 @@ public class BoletoLinhaDigitavelExtractor implements EventoProgramavelJava {
 
         byte[] pdfBytes = obterArquivoEmBytes(idInstPrn, tabela);
         if (pdfBytes == null || pdfBytes.length == 0) {
-            registrarLog("Erro", "PDF não encontrado em " + tabela, null, "Boleto", codUsu, idInstPrn);
-            updateData(vo, tabela, null, "PDF não encontrado");
+            registrarLog("Erro", "PDF nÃ£o encontrado em " + tabela, null, "Boleto", codUsu, idInstPrn);
+            updateData(vo, tabela, null, "PDF nÃ£o encontrado");
             return;
         }
 
@@ -143,7 +143,7 @@ public class BoletoLinhaDigitavelExtractor implements EventoProgramavelJava {
             try {
                 codigo = BoletoZXingExtractor.decodeBarcodeFromPdf(pdfBytes);
                 if (codigo != null) {
-                    registrarLog("Sucesso ZXing", "Código ZXing: " + codigo, codigo, "Boleto", codUsu, idInstPrn);
+                    registrarLog("Sucesso ZXing", "CÃ³digo ZXing: " + codigo, codigo, "Boleto", codUsu, idInstPrn);
                 }
             } catch (Exception e) {
                 registrarLog("Erro ZXing", e.getMessage(), null, "Boleto", codUsu, idInstPrn);
@@ -167,11 +167,11 @@ public class BoletoLinhaDigitavelExtractor implements EventoProgramavelJava {
         }
 
         if (codigo != null && !codigo.isEmpty()) {
-            registrarLog("Sucesso Extração", "Código extraído: " + codigo, codigo, "Boleto", codUsu, idInstPrn);
+            registrarLog("Sucesso ExtraÃ­do", "CÃ³digo extraÃ­do: " + codigo, codigo, "Boleto", codUsu, idInstPrn);
             updateData(vo, tabela, codigo.replaceAll("\\D+", ""), null);
         } else {
-            registrarLog("Falha Extração", "Não foi possível extrair o código de barras.", null, "Boleto", codUsu, idInstPrn);
-            updateData(vo, tabela, null, "Falha na extração");
+            registrarLog("Falha ExtraÃ­do", "nÃ£o foi possï¿½vel extrair o CÃ³digo de barras.", null, "Boleto", codUsu, idInstPrn);
+            updateData(vo, tabela, null, "Falha na ExtraÃ­do");
         }
     }
 
