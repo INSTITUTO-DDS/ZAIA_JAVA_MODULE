@@ -105,7 +105,8 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
                     finVo.setProperty("HISTORICO", observacoes);
                     finVo.setProperty("AD_ORIGEMFLOW", "S");
 
-                    if ("B".equals(tipoPag) && (codBarra == null || codBarra.trim().isEmpty()))  { // Ajuste feito em 31/10/2025
+                    if ("B".equals(tipoPag) && (codBarra == null || codBarra.trim().isEmpty())) { // Ajuste feito em
+                                                                                                  // 31/10/2025
                         throw new MGEModelException("Código de barras inválido: " + codBarra);
                     }
                     finVo.setProperty("CODBARRA", codBarra);
@@ -128,8 +129,6 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
                 nativeSql.setNamedParameter("NUFIN", nufinRec);
                 nativeSql.executeUpdate();
 
-                nativeSql.close(); // Ajuste feito em 31/10/2025
-
                 JapeWrapper finDao = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
                 DynamicVO finVO = finDao.findByPK(nufinRec);
 
@@ -140,8 +139,6 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
 
                 ResultSet rsDados = qryDados.executeQuery();
 
-                qryDados.close(); // Ajuste feito em 31/10/2025
-
                 while (rsDados.next()) {
                     JapeWrapper finDAO = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
                     FluidUpdateVO finUpdVO = finDAO.prepareToUpdate(finVO);
@@ -151,6 +148,10 @@ public class incFinanceiroDiretoZaya implements TarefaJava {
                     finUpdVO.set("AD_FATOBSSOLICIT", rsDados.getBigDecimal("AJUSTESTEXT"));
                     finUpdVO.update();
                 }
+
+                nativeSql.close(); // Ajuste feito em 31/10/2025
+                qryDados.close(); // Ajuste feito em 31/10/2025
+
                 rsDados.close();
 
                 jdbc.closeSession();

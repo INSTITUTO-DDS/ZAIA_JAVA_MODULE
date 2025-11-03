@@ -57,8 +57,6 @@ public class FlowHelperIdds {
 
             ResultSet rs = qryFin.executeQuery();
 
-            qryFin.close(); // Ajuste feito em 31/10/2025
-
             while (rs.next()) {
                 System.out.println("___Entrei no while dos financeiros___");
                 if (mdf.isModifing("DHBAIXA") && mdf.getNewValue("DHBAIXA") != null) {
@@ -223,8 +221,6 @@ public class FlowHelperIdds {
 
                                             ResultSet rsCodBarras = qryCodBarras.executeQuery();
 
-                                            qryCodBarras.close(); // Ajuste feito em 31/10/2025
-
                                             while (rsCodBarras.next()) {
                                                 JapeWrapper finDAO = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
                                                 FluidUpdateVO finUpdVO = finDAO.prepareToUpdate(dynamicVO);
@@ -234,6 +230,7 @@ public class FlowHelperIdds {
                                                 finUpdVO.update();
                                             }
                                             rsCodBarras.close();
+                                            qryCodBarras.close();
                                         } catch (Exception e) {
                                             e.printStackTrace();
                                         } finally {
@@ -260,6 +257,8 @@ public class FlowHelperIdds {
                 }
             }
             rs.close();
+            qryFin.close(); // Ajuste feito em 31/10/2025
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new MGEModelException(e);
@@ -293,8 +292,6 @@ public class FlowHelperIdds {
                 qryDados.setNamedParameter("NUFIN", nuFin);
 
                 rsDados = qryDados.executeQuery();
-
-                qryDados.close(); // Ajuste feito em 31/10/2025
 
                 String idElemento = " ";
 
@@ -386,9 +383,6 @@ public class FlowHelperIdds {
             ResultSet rsTarefas = null;
             rsTarefas = qryTarefas.executeQuery();
 
-            qryTarefas.close(); // Ajuste feito em 31/10/2025
-
-
             while (rsTarefas.next()) {
                 processId = rsTarefas.getBigDecimal("PROCESSID");
                 processInstanceId = rsTarefas.getBigDecimal("PROCESSINSTANCEID");
@@ -396,6 +390,7 @@ public class FlowHelperIdds {
                 taskIdElemento = rsTarefas.getString("TASKIDELEMENTO");
             }
             rsTarefas.close();
+            qryTarefas.close(); // Ajuste feito em 31/10/2025
 
             AuthenticationInfo auth = new AuthenticationInfo("SUP", BigDecimal.ZERO, BigDecimal.ZERO, 0);
             auth.makeCurrent();
@@ -466,9 +461,6 @@ public class FlowHelperIdds {
             qryArquivo.setNamedParameter("NUFIN", nuFin);
             ResultSet rsArquivo = qryArquivo.executeQuery();
 
-            qryArquivo.close(); // Ajuste feito em 31/10/2025
-
-
             String chave = "";
             String filePath = "";
 
@@ -477,6 +469,7 @@ public class FlowHelperIdds {
                 filePath = SWRepositoryUtils.getBaseFolder() + "/Sistema/Anexos/Financeiro/" + chave;
             }
             rsArquivo.close();
+            qryArquivo.close(); // Ajuste feito em 31/10/2025
 
             System.out.println(filePath);
 

@@ -144,7 +144,7 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
                 }
             }
 
-             qryFin.close();
+            qryFin.close();
 
         }
     }
@@ -171,9 +171,6 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
             ResultSet rsTarefas = null;
             rsTarefas = qryTarefas.executeQuery();
 
-
-            qryTarefas.close(); // Ajuste feito em 31/10/2025
-
             while (rsTarefas.next()) {
                 processId = rsTarefas.getBigDecimal("PROCESSID");
                 processInstanceId = rsTarefas.getBigDecimal("PROCESSINSTANCEID");
@@ -181,6 +178,7 @@ public class AtualizaStatusFlow implements AcaoRotinaJava {
                 taskIdElemento = rsTarefas.getString("TASKIDELEMENTO");
             }
             rsTarefas.close();
+            qryTarefas.close(); // Ajuste feito em 31/10/2025
 
             AuthenticationInfo auth = new AuthenticationInfo("SUP", BigDecimal.ZERO, BigDecimal.ZERO, 0);
             auth.makeCurrent();

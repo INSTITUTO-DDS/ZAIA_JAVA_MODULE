@@ -83,7 +83,7 @@ public class EventoFinanceiroFlow implements EventoProgramavelJava {
 
             ResultSet rsCodBarras = qryCodBarras.executeQuery();
 
-            qryCodBarras.close(); // Ajuste feito em 31/10/2025
+            
 
             while (rsCodBarras.next()) {
                 JapeWrapper finDAO = JapeFactory.dao(DynamicEntityNames.FINANCEIRO);
@@ -97,11 +97,16 @@ public class EventoFinanceiroFlow implements EventoProgramavelJava {
                 finUpdVO.update();
             }
             rsCodBarras.close();
+
+            qryCodBarras.close(); // Ajuste feito em 31/10/2025
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            
             jdbc.closeSession();
         }
+
+        
     }
 
     @Override
